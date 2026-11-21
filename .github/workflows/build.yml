@@ -1,7 +1,11 @@
+
 name: Build Liquid Glass APK
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -15,17 +19,19 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: '17'
 
-            - name: Set up Android SDK
+      - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
           packages: platform-tools
 
+      - name: Extract project
+        run: unzip LiquidGlassAndroid_Project.zip -d project
+
       - name: Build APK
+        working-directory: project
         run: |
-          unzip LiquidGlassAndroid_Project.zip -d project
-          cd project
           chmod +x gradlew
           ./gradlew assembleDebug
 
@@ -34,3 +40,4 @@ jobs:
         with:
           name: LiquidGlassAndroid-APK
           path: project/**/build/outputs/apk/debug/*.apk
+          
